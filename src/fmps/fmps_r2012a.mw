@@ -1,0 +1,1117 @@
+%
+% The FMPS Software, Version 3.0
+% 
+% Copyright (C) 2009-2012 Leslie Greengard and Zydrunas Gimbutas. 
+% All rights reserved.
+%
+
+
+@function [asmpole,bsmpole] = em3d_multa_mptaf90(nspheres,nterms,ncoefs,omega,eps0,cmu0,center,radius,aompole,bompole,rnodes,weights,nphi,ntheta)
+%EM3D_MULTA_MPTAF90: Direct (slow) EM multipole to local translation routine.
+%
+%  [ASMPOLE,BSMPOLE] = EM3D_MULTA_MPTAF90(NSPHERES,NTERMS,NCOEFS,...
+%       OMEGA,EPS0,CMU0,CENTER,RADIUS,AOMPOLE,BOMPOLE,...
+%       RNODES,WEIGHTS,NPHI,NTHETA);
+%
+%  Convert outgoing EM multipole expansions for a collection of spheres to
+%  the incoming EM multipole expansions. Self interactions are NOT included.
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nspheres - the number of spheres
+%    nterms - the number of terms in multipole expansions
+%    ncoefs - currently, must be set to to (NTERMS+1)*(2*NTERMS+1)
+%    omega - angular frequency parameter
+%    eps0 - complex: permittivity of exterior media
+%    cmu0 - complex: permeability of exterior media
+%    center - real(3,nsource): sphere center locations
+%    radius - real(nsource): sphere radii
+%    aompole,bompole - complex(ncoefs,nspheres): outgoing EM multipoles
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms)
+%                 
+%  Output parameters:
+%
+%    asmpole,bsmpole - complex(ncoefs,nspheres): incoming EM multipoles
+%
+%
+
+asmpole = zeros(ncoefs,nspheres) + 1i*zeros(ncoefs,nspheres);
+bsmpole = zeros(ncoefs,nspheres) + 1i*zeros(ncoefs,nspheres);
+
+if( nspheres > 1 ),
+# FORTRAN em3dmpta(int[1] nspheres,int[1] nterms,int[1] ncoefs,double[1] omega,dcomplex[1] eps0,dcomplex[1] cmu0,double[] center,double[] radius,dcomplex[] aompole,dcomplex[] bompole,inout dcomplex[] asmpole,inout dcomplex[] bsmpole,double[] rnodes,double[] weights,int[1] nphi,int[1] ntheta);
+end
+
+
+@function [asmpole,bsmpole] = em3d_multa_mptafmm(iprec,nspheres,nterms,ncoefs,omega,eps0,cmu0,center,radius,aompole,bompole,rnodes,weights,nphi,ntheta)
+%EM3D_MULTA_MPTAFMM: FMM accelerated EM multipole to local translation routine.
+%
+%  [ASMPOLE,BSMPOLE] = EM3D_MULTA_MPTAFMM(NSPHERES,NTERMS,NCOEFS,...
+%       OMEGA,EPS0,CMU0,CENTER,RADIUS,AOMPOLE,BOMPOLE,...
+%       RNODES,WEIGHTS,NPHI,NTHETA);
+%
+%  Convert outgoing EM multipole expansions for a collection of spheres to
+%  the incoming EM multipole expansions. Self interactions are NOT included.
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nspheres - the number of spheres
+%    nterms - the number of terms in multipole expansions
+%    ncoefs - currently, must be set to to (NTERMS+1)*(2*NTERMS+1)
+%    omega - angular frequency parameter
+%    eps0 - complex: permittivity of exterior media
+%    cmu0 - complex: permeability of exterior media
+%    center - real(3,nsource): sphere center locations
+%    radius - real(nsource): sphere radii
+%    aompole,bompole - complex(ncoefs,nspheres): outgoing EM multipoles
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms)
+%                 
+%  Output parameters:
+%
+%    asmpole,bsmpole - complex(ncoefs,nspheres): incoming EM multipoles
+%
+%
+
+zk = omega*sqrt(eps0)*sqrt(cmu0);
+
+asmpole = zeros(ncoefs,nspheres) + 1i*zeros(ncoefs,nspheres);
+bsmpole = zeros(ncoefs,nspheres) + 1i*zeros(ncoefs,nspheres);
+
+ier=0;
+
+if( nspheres > 1 ),
+# FORTRAN emfmm3dsph(inout int[1] ier,int[1] iprec,dcomplex[1] zk,int[1] nspheres,double[] center,double[] radius,dcomplex[] aompole,dcomplex[] bompole,inout dcomplex[] asmpole,inout dcomplex[] bsmpole,int[1] nterms);
+end
+
+
+@function [evec,hvec] = em3d_mpole_targeval(nspheres,nterms,ncoefs,omega,eps0,cmu0,center,radius,aompole,bompole,ntargets,targets)
+%EM3D_MPOLE_TARGEVAL: Evaluate EM multipoles at a collection of targets.
+%
+%  [EVEC,HVEC] = EM3D_MPOLE_TARGEVAL(NSPHERES,NTERMS,NCOEFS,...
+%       OMEGA,EPS0,CMU0,CENTER,RADIUS,AOMPOLE,BOMPOLE,...
+%       NTARGETS,TARGETS);
+%
+%  Evaluate the outgoing EM multipole expansions at a collection of targets.
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nspheres - the number of spheres
+%    nterms - the number of terms in multipole expansions
+%    ncoefs - currently, must be set to to (NTERMS+1)*(2*NTERMS+1)
+%    omega - angular frequency parameter
+%    eps0 - complex: permittivity of exterior media
+%    cmu0 - complex: permeability of exterior media
+%    center - real(3,nsource): sphere center locations
+%    radius - real(nsource): sphere radii
+%    aompole,bompole - complex(ncoefs,nspheres): outgoing EM multipoles
+%    ntargets - the number of targets
+%    targets - real(3,ntargets): target locations
+%                 
+%  Output parameters:
+%
+%    evec,hvec - complex(3,ntargets): E and H fields at the targets
+%
+%
+
+evec = zeros(3,ntargets) + 1i*zeros(3,ntargets);
+hvec = zeros(3,ntargets) + 1i*zeros(3,ntargets);
+
+# FORTRAN em3dmpoletargeval(int[1] nspheres,int[1] nterms,int[1] ncoefs,double[1] omega,dcomplex[1] eps0,dcomplex[1] cmu0,double[] center,double[] radius,dcomplex[] aompole,dcomplex[] bompole,int[] ntargets, double[] targets, inout dcomplex[] evec,inout dcomplex[] hvec);
+
+
+@function [evec,hvec] = em3d_local_targeval(nspheres,nterms,ncoefs,omega,eps0,cmu0,center,radius,aimpole,bimpole,ntargets,targets)
+%EM3D_LOCAL_TARGEVAL:Evaluate EM incoming multipoles at a collection of targets.
+%
+%  [EVEC,HVEC] = EM3D_LOCAL_TARGEVAL(NSPHERES,NTERMS,NCOEFS,...
+%       OMEGA,EPS0,CMU0,CENTER,RADIUS,AIMPOLE,BIMPOLE,...
+%       NTARGETS,TARGETS);
+%
+%  Evaluate the incoming EM multipole expansions at a collection of targets.
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nspheres - the number of spheres
+%    nterms - the number of terms in multipole expansions
+%    ncoefs - currently, must be set to to (NTERMS+1)*(2*NTERMS+1)
+%    omega - angular frequency parameter
+%    eps0 - complex: permittivity of exterior media
+%    cmu0 - complex: permeability of exterior media
+%    center - real(3,nsource): sphere center locations
+%    radius - real(nsource): sphere radii
+%    aimpole,bimpole - complex(ncoefs,nspheres): incoming EM multipoles
+%    ntargets - the number of targets
+%    targets - real(3,ntargets): target locations
+%                 
+%  Output parameters:
+%
+%    evec,hvec - complex(3,ntargets): E and H fields at the targets
+%
+%
+
+evec = zeros(3,ntargets) + 1i*zeros(3,ntargets);
+hvec = zeros(3,ntargets) + 1i*zeros(3,ntargets);
+
+# FORTRAN em3dlocaltargeval(int[1] nspheres,int[1] nterms,int[1] ncoefs,double[1] omega,dcomplex[1] eps0,dcomplex[1] cmu0,double[] center,double[] radius,dcomplex[] aimpole,dcomplex[] bimpole,int[] ntargets, double[] targets, inout dcomplex[] evec,inout dcomplex[] hvec);
+
+
+@function [evec,hvec]=em3d_planearb_targeval(rkvec,epol,ntargets,targets)
+%EM3D_PLANEARB_TARGEVAL: Evaluate an arbitrary plane wave at a collection of targets.
+%
+%  [EVEC,HVEC] = EM3D_PLANEARB_TARGEVAL(RKVEK,EPOL,NTARGETS,TARGETS);
+%
+%  Evaluate an arbitrary oriented plane wave at a collection of targets.
+%  
+%  Input parameters:
+%
+%    rkvec - the vector Helmholz parameter
+%    epol - the polarization vector
+%    ntargets - the number of targets
+%    targets - real(3,ntargets): target locations
+%                 
+%  Output parameters:
+%
+%    evec,hvec - complex(3,ntargets): E and H fields at the targets
+%
+%
+
+evec = zeros(3,ntargets) + 1i*zeros(3,ntargets);
+hvec = zeros(3,ntargets) + 1i*zeros(3,ntargets);
+
+# FORTRAN emplanearbtargeval(dcomplex[] rkvec,dcomplex[] epol,int[1] ntargets,double[] targets,inout dcomplex[] evec,inout dcomplex[] hvec);
+
+
+@function [frames]=em3orient(rot,nspheres)
+%EM3ORIENT Convert Euler angles into orientation frames.
+%
+%  FRAMES=EM3ORIENT(SPHERE_ROT,NSPHERES);
+%
+%  Input parameters:
+%
+%    sphere_rot - real(3,nspheres): Euler angles for a collection of spheres
+%    nspheres - the number of spheres
+%
+%  Output parameters:
+%
+%    frames - real(3,3,nspheres): rotation matrices (frames) for all spheres
+%
+
+frames = zeros(9,nspheres);
+
+#FORTRAN em3orient(double[] rot,int[1] nspheres,inout double[] frames);
+
+frames = reshape(frames,3,3,nspheres);
+
+
+
+@function [pvec,mvec]=empol(wavelength,rk,ampole,bmpole,nterms,radius)
+%EMPOL: Evaluate electric polarization and magnetization vectors.
+%
+%  Evaluate electric polarization and magnetization vectors 
+%  for a single sphere.
+%
+%  [pvec,mvec]=empol(wavelength,rk,ampole,bmpole,nterms,radius);
+%
+%  Input parameters:
+%
+%    wavelength - unused
+%    rk - the frequency parameter
+%    ampole,bmpole - complex(ncoefs): outgoing EM multipoles
+%    nterms - the number of terms in multipole expansion
+%    radius - unused
+%
+%  Output parameter:
+%
+%    pvec - complex(3) - electric polarization vector
+%    mvec - complex(3) - magnetic polarization (magnetization) vector
+%
+%  All EM multipoles are NCOEFS = (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+
+pvec = zeros(3,1) + 1i*zeros(3,1);
+mvec = zeros(3,1) + 1i*zeros(3,1);
+
+# FORTRAN empol(double[1] wavelength,dcomplex[1] rk,dcomplex[] ampole,dcomplex[] bmpole,int[1] nterms,double[1] radius,inout dcomplex[] pvec,inout dcomplex[] mvec);
+
+
+
+@function [mpout] = emabrotaf(nterms,rota,mpole)
+%EMABROTF: Apply forward rotation operator to EM multipole.
+%
+%  MPOUT = EMABROTF(NTERMS,ROTA,MPOLE);
+%
+%  Apply forward rotation operator to EM multipole.
+%  
+%  Both MPOLE and MPOUT are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in multipole expansion
+%    rota - real(3): Euler rotation angles
+%    mpole - complex(ncoefs): the EM multipole to be rotated
+%                 
+%  Output parameters:
+%
+%    mout - complex(ncoefs): the rotated EM multipole
+%
+%
+
+ncoefs = (nterms+1)*(2*nterms+1);
+mpout = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+
+# FORTRAN emabrotaf(int[1] nterms,double[] rota,dcomplex[] mpole,inout dcomplex[] mpout);
+
+
+
+@function [mpout] = emabrotab(nterms,rota,mpole)
+%EMABROTB: Apply inverse rotation operator to EM multipole.
+%
+%  MPOUT = EMABROTB(NTERMS,ROTA,MPOLE);
+%
+%  Apply inverse rotation operator to EM multipole.
+%  
+%  Both MPOLE and MPOUT are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in multipole expansion
+%    rota - real(3): Euler rotation angles
+%    mpole - complex(ncoefs): the EM multipole to be rotated
+%                 
+%  Output parameters:
+%
+%    mout - complex(ncoefs): the rotated EM multipole
+%
+%
+
+ncoefs = (nterms+1)*(2*nterms+1);
+mpout = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+
+# FORTRAN emabrotab(int[1] nterms,double[] rota,dcomplex[] mpole,inout dcomplex[] mpout);
+
+
+
+
+@function [cvec]=em3sphlin(nterms,ampole)
+%EM3SPHLIN: Convert multipole expansion from unrolled format into linear.
+%
+%  [CVEC]=em3sphlin(NTERMS,AMPOLE);
+%
+%  AMPOLE is NCOEFS=(NTERMS+1)-by-(2*NTERMS+1) complex matrix.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in multipole expansion
+%    ampole - complex(ncoefs): the EM multipole in standard unrolled format.
+%
+%  Output parameters:
+%
+%    cvec - complex((nterms+1)^2): the EM multipole in compressed linear format.
+%
+
+nvec = (nterms+1)*(nterms+1);
+cvec = zeros(nvec,1) + 1i*zeros(nvec,1);
+
+# FORTRAN em3sphlin(dcomplex[] ampole,int[1] nterms,inout dcomplex[] cvec);
+
+
+@function [ampole]=em3linsph(nterms,cvec)
+%EM3LINSPH: Convert multipole expansion from linear format into unrolled.
+%
+%  [AMPOLE]=em3linsph(NTERMS,CVEC);
+%
+%  AMPOLE is NCOEFS=(NTERMS+1)-by-(2*NTERMS+1) complex matrix.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in multipole expansion
+%    cvec - complex((nterms+1)^2): the EM multipole in compressed linear format.
+%
+%  Output parameters:
+%
+%    ampole - complex(ncoefs): the EM multipole in standard unrolled format.
+%
+
+ncoefs = (nterms+1)*(2*nterms+1);
+ampole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+
+# FORTRAN em3linsph(inout dcomplex[] ampole,int[1] nterms,dcomplex[] cvec);
+
+
+
+
+@function [evec,hvec]=dipole3et(rk,source,target,cjvec)
+%DIPOLE3ET: Evaluate E and H fields of an electric dipole.
+%
+%   [EVEC,HVEC]=dipole3et(RK,SOURCE,TARGET,CJVEC);
+%
+%   Evaluate E and H fields at the location target due
+%   to the monochromatic electric dipole cjvec located 
+%   at an arbitrary source location.
+%
+%   Input parameters:
+%
+%       rk (complex *16)  - the frequency parameter
+%       source (real *8 ) - the source point in R^3
+%       target (real *8 ) - the target point in R^3
+%       cjvec (complex *16) - the strength of the electric dipole   
+%
+%   Output parameters:
+%
+%       evec (complex*16) - the electric field at the target
+%       hvec (complex*16) - the magnetic field at the target
+%
+
+evec = zeros(3,1) + 1i*zeros(3,1);
+hvec = zeros(3,1) + 1i*zeros(3,1);
+
+# FORTRAN dipole3et(dcomplex[1] rk, double[3] source, double[3] target, dcomplex[3] cjvec, inout dcomplex[3] evec, inout dcomplex[3] hvec);
+
+
+@function [evec,hvec]=dipole3mt(rk,source,target,cmvec)
+%DIPOLE3MT: Evaluate E and H fields of a magnetic dipole.
+%
+%   [EVEC,HVEC]=dipole3mt(RK,SOURCE,TARGET,CMVEC);
+%
+%   Evaluate E and H fields at the location target due
+%   to the monochromatic magnetic dipole cmvec located
+%   at an arbitrary source location.
+%
+%   Input parameters:
+%
+%       rk (complex *16)  - the frequency parameter
+%       source (real *8 ) - the source point in R^3
+%       target (real *8 ) - the target point in R^3
+%       cmvec (complex *16) - the strength of the magnetic dipole
+%
+%   Output parameters:
+%
+%       evec (complex*16) - the electric field at the target
+%       hvec (complex*16) - the magnetic field at the target
+%
+
+evec = zeros(3,1) + 1i*zeros(3,1);
+hvec = zeros(3,1) + 1i*zeros(3,1);
+
+# FORTRAN dipole3mt(dcomplex[1] rk, double[3] source, double[3] target, dcomplex[3] cmvec, inout dcomplex[3] evec, inout dcomplex[3] hvec);
+
+
+
+
+@function [rnodes,weights,nnodes]=e3fgrid(itype,nquad,nphi,ntheta)
+%E3FGRID: Construct a spherical grid in R^3.
+%
+%  [rnodes,weights,nnodes]=e3fgrid(itype,nquad,nphi,ntheta);
+%
+%  Construct a spherical grid on a unit sphere in R^3. For itype=1, the nodes
+%  in theta direction are Gauss-Legendre quadrature nodes in z, and uniformly
+%  spaced in phi (compatible with FFTPACK).
+%
+%  Input parameters:
+%
+%    itype - (internal parameter, leave set to 1).
+%    nquad - (internal parameter, leave set to ntheta).
+%    nphi - number of nodes in angular phi direction
+%    ntheta - number of nodes in theta direction 
+%
+%  Output parameters:
+%
+%    rnodes - real (3,nphi*ntheta): the spherical grid
+%    weights - real (nphi*ntheta): the associated quadrature weights
+%    nnodes - the number of nodes in spherical grid
+%    
+
+rnodes = zeros(3,nphi*ntheta);
+weights = zeros(1,nphi*ntheta);
+nnodes = 0;
+
+# FORTRAN e3fgrid(int[1] itype,int[1] nquad,int[1] nphi,int[1] ntheta,double[] rnodes,inout double[] weights,inout int[] nnodes);        
+
+
+@function [aompole,bompole]=em3ehformmp(rk, sphere_xyz, sphere_r, rnodes, weights, nphi, ntheta, evecs, hvecs, nterms)
+%em3ehformmp: Form outgoing EM multipole from E,H values on a spherical grid.
+%
+%  [aompole,bompole]=em3ehformmp(rk, sphere_xyz, sphere_r,...
+%           rnodes, weights, nphi, ntheta, evecs, hvecs, nterms);
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    sphere_xyz - real(3): sphere center location (for both E,H and multipoles)
+%    sphere_r - sphere radius (for both E,H and multipoles)
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms)
+%    evecs,hvecs - E and H values on the spherical grid.
+%    nterms - the number of terms in multipole expansions to be formed
+%                 
+%  Output parameters:
+%
+%    aompole,bompole - complex(ncoefs): outgoing EM multipoles
+%
+%
+
+ncoefs = (nterms+1)*(2*nterms+1);
+aompole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+bompole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+
+# FORTRAN em3ehformmp (dcomplex[1] rk, double[] sphere_xyz, double[] sphere_r, dcomplex[] evecs, dcomplex[] hvecs, double[] rnodes, double[] weights, int[1] nphi, int[1] ntheta, double[1] sphere_r, inout dcomplex[] aompole, inout dcomplex[] bompole, int[1] nterms);
+
+
+@function [aimpole,bimpole]=em3ehformta(rk, sphere_xyz, sphere_r, rnodes, weights, nphi, ntheta, evecs, hvecs, nterms)
+%em3ehformta: Form incoming EM multipole from E,H values on a spherical grid.
+%
+%  [aimpole,bimpole]=em3ehformmp(rk, sphere_xyz, sphere_r,...
+%           rnodes, weights, nphi, ntheta, evecs, hvecs, nterms);
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    sphere_xyz - real(3): sphere center location (for both E,H and multipoles)
+%    sphere_r - sphere radius (for both E,H and multipoles)
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms)
+%    evecs,hvecs - E and H values on the spherical grid.
+%    nterms - the number of terms in multipole expansions to be formed
+%                 
+%  Output parameters:
+%
+%    aimpole,bimpole - complex(ncoefs): incoming EM multipoles
+%
+%
+
+ncoefs = (nterms+1)*(2*nterms+1);
+aimpole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+bimpole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+
+# FORTRAN em3ehformta (dcomplex[1] rk, double[] sphere_xyz, double[] sphere_r, dcomplex[] evecs, dcomplex[] hvecs, double[] rnodes, double[] weights, int[1] nphi, int[1] ntheta, double[1] sphere_r, inout dcomplex[] aimpole, inout dcomplex[] bimpole, int[1] nterms);
+
+
+@function [evecs,hvecs]=em3mpevaleh(rk,center,aompole,bompole,nterms,...
+    sphere_xyz,sphere_r,rnodes,weights,nphi,ntheta)
+%em3mpevaleh:  Evaluate outgoing EM multipole on a spherical grid.
+%
+%  [evecs,hvecs]=em3mpevaleh(rk,center,aompole,bompole,nterms,...
+%         sphere_xyz,sphere_r,rnodes,weights,nphi,ntheta)
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    center - center of the multipole expansion
+%    aompole,bompole - complex(ncoefs): outgoing EM multipoles
+%    nterms - the number of terms in multipole expansions 
+%    sphere_xyz - real(3): sphere center location (for E and H fields)
+%    sphere_r - sphere radius (for E and H fields)
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms)
+%                 
+%  Output parameters:
+%
+%    evecs,hvecs - E and H values on the spherical grid.
+%
+%
+
+nnodes=nphi*ntheta;
+evecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
+hvecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
+
+# FORTRAN em3mpevaleh(dcomplex[1] rk, double[] center,dcomplex[] aompole,dcomplex[] bompole, int[1] nterms,double[] sphere_xyz,double[] sphere_r,inout dcomplex[] evecs,inout dcomplex[] hvecs,double[] rnodes, double[] weights,int[1] nphi,int[1] ntheta);
+
+
+@function [evecs,hvecs]=em3taevaleh(rk,center,aimpole,bimpole,nterms, ...
+    sphere_xyz,sphere_r, ...
+    rnodes,weights,nphi,ntheta)
+%em3taevaleh:  Evaluate incoming EM multipole on a spherical grid.
+%
+%  [evecs,hvecs]=em3taevaleh(rk,center,aimpole,bimpole,nterms,...
+%         sphere_xyz,sphere_r,rnodes,weights,nphi,ntheta)
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    center - center of the multipole expansion
+%    aimpole,bimpole - complex(ncoefs): incoming EM multipoles
+%    nterms - the number of terms in multipole expansions 
+%    sphere_xyz - real(3): sphere center location (for E and H fields)
+%    sphere_r - sphere radius (for E and H fields)
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms)
+%                 
+%  Output parameters:
+%
+%    evecs,hvecs - E and H values on the spherical grid.
+%
+%
+
+nnodes=nphi*ntheta;
+evecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
+hvecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
+
+# FORTRAN em3taevaleh(dcomplex[1] rk, double[] center,dcomplex[] aimpole,dcomplex[] bimpole, int[1] nterms,double[] sphere_xyz,double[] sphere_r,inout dcomplex[] evecs,inout dcomplex[] hvecs,double[] rnodes, double[] weights,int[1] nphi,int[1] ntheta);
+
+
+@function [evecs,hvecs]=em3mpfareh(rk,center,aompole,bompole,nterms, ...
+    rnodes,weights,nphi,ntheta)
+%em3mpfareh: Evaluate the far field signature of the outgoing EM multipole.
+%
+%  [evecs,hvecs]=em3mpfareh(rk,center,aompole,bompole,nterms,...
+%         sphere_xyz,sphere_r,rnodes,weights,nphi,ntheta)
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    center - center of the multipole expansion
+%    aompole,bompole - complex(ncoefs): outgoing EM multipoles
+%    nterms - the number of terms in multipole expansions 
+%    sphere_xyz - real(3): sphere center location (for E and H fields)
+%    sphere_r - sphere radius (for E and H fields)
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms)
+%                 
+%  Output parameters:
+%
+%    evecs,hvecs - far field signature E and H values on the spherical grid.
+%
+%
+
+nnodes=nphi*ntheta;
+evecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
+hvecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
+
+# FORTRAN em3mpfarehfast(dcomplex[1] rk, double[] center,dcomplex[] aompole,dcomplex[] bompole, int[1] nterms, inout dcomplex[] evecs,inout dcomplex[] hvecs,double[] rnodes, double[] weights,int[1] nphi,int[1] ntheta);
+
+
+@function [ampole,bmpole]=em3formmp(rk,source,cjvec,cmvec,center,nterms)
+%em3formmp: Form the outgoing EM multipole expansion.
+%
+%  [ampole,bmpole]=em3formmp(rk,source,cjvec,cmvec,center,nterms);
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    center - center of the multipole expansion
+%    source - real(3,nsource): the source locations in R^3
+%    cjvec - complex(3,nsource): the strengths of the electric dipoles 
+%    cmvec - complex(3,nsource): the strengths of the magnetic dipoles  
+%    nterms - the number of terms in multipole expansion
+%                 
+%  Output parameters:
+%
+%    ampole,bmpole - complex(ncoefs): outgoing EM multipoles
+%
+%
+
+npts=size(source,2);
+ncoefs = (nterms+1)*(2*nterms+1);
+ampole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+bmpole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+
+# FORTRAN em3formmp(dcomplex[1] rk,double[] source,dcomplex[] cjvec,dcomplex[] cmvec,int[1] npts,double[] center,inout dcomplex[] ampole,inout dcomplex[] bmpole,int[1] nterms);
+
+
+@function [ampole,bmpole]=em3formta(rk,source,cjvec,cmvec,center,nterms)
+%em3formta: Form the incoming EM multipole expansion.
+%
+%  [ampole,bmpole]=em3formta(rk,source,cjvec,cmvec,center,nterms);
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    center - center of the multipole expansion
+%    source - real(3,nsource): the source locations in R^3
+%    cjvec - complex(3,nsource): the strengths of the electric dipoles 
+%    cmvec - complex(3,nsource): the strengths of the magnetic dipoles  
+%    nterms - the number of terms in multipole expansion
+%                 
+%  Output parameters:
+%
+%    ampole,bmpole - complex(ncoefs): incoming EM multipoles
+%
+%
+
+npts=size(source,2);
+ncoefs = (nterms+1)*(2*nterms+1);
+ampole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+bmpole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
+
+# FORTRAN em3formta(dcomplex[1] rk,double[] source,dcomplex[] cjvec,dcomplex[] cmvec,int[1] npts,double[] center,inout dcomplex[] ampole,inout dcomplex[] bmpole,int[1] nterms);
+
+
+
+@function [evec,hvec]=em3mpeval(rk,center,aompole,bompole,nterms,target)
+%em3mpeval: Evaluate outgoing EM multipole expansion at a single target.
+%
+%  [evec,hvec]=em3mpeval(rk,center,aompole,bompole,nterms,target);
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    center - center of the multipole expansion
+%    aompole,bompole - complex(ncoefs): outgoing EM multipoles
+%    nterms - the number of terms in multipole expansion
+%    target - real(3): target location
+%                 
+%  Output parameters:
+%
+%    evec,hvec - complex(3): E and H fields at the targets
+%
+%
+
+evec = zeros(3,1) + 1i*zeros(3,1);
+hvec = zeros(3,1) + 1i*zeros(3,1);
+
+# FORTRAN em3mpeval(dcomplex[1] rk, double[] center,dcomplex[] aompole,dcomplex[] bompole, int[1] nterms,double[] target,inout dcomplex[] evec,inout dcomplex[] hvec);
+
+
+@function [evec,hvec]=em3taeval(rk,center,aompole,bompole,nterms,target)
+%em3mpeval: Evaluate incoming EM multipole expansion at a single target.
+%
+%  [evec,hvec]=em3taeval(rk,center,aimpole,bimpole,nterms,target);
+%
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    rk - the frequency parameter
+%    center - center of the multipole expansion
+%    aimpole,bimpole - complex(ncoefs): incoming EM multipoles
+%    nterms - the number of terms in multipole expansion
+%    target - real(3): target location
+%                 
+%  Output parameters:
+%
+%    evec,hvec - complex(3): E and H fields at the targets
+%
+%
+
+evec = zeros(3,1) + 1i*zeros(3,1);
+hvec = zeros(3,1) + 1i*zeros(3,1);
+
+# FORTRAN em3taeval(dcomplex[1] rk, double[] center,dcomplex[] aompole,dcomplex[] bompole, int[1] nterms,double[] target,inout dcomplex[] evec,inout dcomplex[] hvec);
+
+
+@function [hvals,hders,emthvals,emrhvals] = emhevalrt(nterms,z)
+%EMHEVALRT Spherical Bessel h functions.
+%
+%   [hvals,hders,emthvals,emrhvals] = emhevalrt(nterms,z);
+%
+%   Spherical Bessel h functions
+%
+%   Evaluate the h values, derivatives, tangential and radial 
+%   em-scaling factors for the complex parameter z.
+%
+%   Input parameters:
+%
+%     nterms - the number of terms in em-multipole expansion
+%     z - the complex argument
+%
+%   Output parameters:
+%
+%     hvals - h_n(z) values 
+%     hders - h_n(z) derivatives
+%     emthvals - the tangential outgoing em-scaling factors
+%     emrhvals - the radial outgoing em-scaling factors
+%
+
+hvals = zeros(nterms+1,1) + 1i*zeros(nterms+1,1);
+hders = zeros(nterms+1,1) + 1i*zeros(nterms+1,1);
+emthvals = zeros(nterms+1,1) + 1i*zeros(nterms+1,1);
+emrhvals = zeros(nterms+1,1) + 1i*zeros(nterms+1,1);
+
+# FORTRAN emhevalrt(int[1] nterms,dcomplex[1] z,inout dcomplex[] hvals,inout dcomplex[] hders,inout dcomplex[] emthvals,inout dcomplex[] emrhvals);
+
+
+@function [jvals,jders,emtjvals,emrjvals] = emjevalrt(nterms,z)
+%EMJEVALRT Spherical Bessel j functions.
+%
+%   [jvals,jders,emtjvals,emrjvals] = emjevalrt(nterms,z);
+%
+%   Spherical Bessel j functions
+%
+%   Evaluate the j values, derivatives, tangential and radial 
+%   em-scaling factors for the complex parameter z.
+%
+%   Input parameters:
+%
+%     nterms - the number of terms in em-multipole expansion
+%     z - the complex argument
+%
+%   Output parameters:
+%
+%     jvals - j_n(z) values 
+%     jders - j_n(z) derivatives
+%     emtjvals - the tangential incoming em-scaling factors
+%     emrjvals - the radial incoming em-scaling factors
+%
+
+jvals = zeros(nterms+1,1) + 1i*zeros(nterms+1,1);
+jders = zeros(nterms+1,1) + 1i*zeros(nterms+1,1);
+emtjvals = zeros(nterms+1,1) + 1i*zeros(nterms+1,1);
+emrjvals = zeros(nterms+1,1) + 1i*zeros(nterms+1,1);
+
+# FORTRAN emjevalrt(int[1] nterms,dcomplex[1] z,inout dcomplex[] jvals,inout dcomplex[] jders,inout dcomplex[] emtjvals,inout dcomplex[] emrjvals);
+
+
+@function [ampole1,bmpole1]=em3mpmp3(rk,center,ampole,bmpole,nterms,center1,nterms1,radius1,rnodes,weights,nphi,ntheta)
+%em3mpmp3: Apply EM multipole to multipole translation operator.
+%
+%  [ampole1,bmpole1]=em3mpmp3(rk,center,ampole,bmpole,nterms,...
+%           center1,nterms1,radius1,rnodes,weights,nphi,ntheta);
+%
+%  Convert the outgoing EM multipole expansion to
+%  the shifted outgoing EM multipole expansion. 
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in outgoing multipole expansions
+%    rk - frequency parameter
+%    center - real(3): sphere center location for outgoing expansion
+%    ampole,bmpole - complex(ncoefs,nspheres): outgoing EM multipoles
+%    center1 - real(3): sphere center location for shifted outgoing expansion
+%    nterms1 - the number of terms in shifted outgoing multipole expansions
+%    radius1 - real(nsource): sphere radius for the shifted outgoing expansion
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms1)
+%                 
+%  Output parameters:
+%
+%    ampole1,bmpole1 - complex(ncoefs1): shifted outgoing EM multipoles
+%
+%
+
+ncoefs1 = (nterms1+1)*(2*nterms1+1);
+ampole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+bmpole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+
+
+#FORTRAN em3mpmp3(dcomplex[1] rk,double[] center,dcomplex[] ampole,dcomplex[] bmpole,int[1] nterms,double[] center1,inout dcomplex[] ampole1,inout dcomplex[] bmpole1,int[1] nterms1,double[] radius1,double[] rnodes,double[] weights,int[1] nphi,int[1] ntheta);
+
+
+@function [ampole1,bmpole1]=em3mpmp3_trunc(rk,center,ampole,bmpole,nterms,center1,nterms1,radius1,rnodes,weights,nphi,ntheta)
+%em3mpmp3_trunc: Apply EM multipole to multipole translation operator.
+%
+%  [ampole1,bmpole1]=em3mpmp3(rk,center,ampole,bmpole,nterms,...
+%           center1,nterms1,radius1,rnodes,weights,nphi,ntheta);
+%
+%  Convert the outgoing EM multipole expansion to
+%  the shifted outgoing EM multipole expansion with truncation. 
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in outgoing multipole expansions
+%    rk - frequency parameter
+%    center - real(3): sphere center location for outgoing expansion
+%    ampole,bmpole - complex(ncoefs,nspheres): outgoing EM multipoles
+%    center1 - real(3): sphere center location for shifted outgoing expansion
+%    nterms1 - the number of terms in shifted outgoing multipole expansions
+%    radius1 - real(nsource): sphere radius for the shifted outgoing expansion
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a 
+%          preceding call to get_e3fgrid_trunc(nterms1,nterms1_phi)
+%                 
+%  Output parameters:
+%
+%    ampole1,bmpole1 - complex(ncoefs1): shifted outgoing EM multipoles
+%
+%
+
+ncoefs1 = (nterms1+1)*(2*nterms1+1);
+ampole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+bmpole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+
+
+#FORTRAN em3mpmp3trunc(dcomplex[1] rk,double[] center,dcomplex[] ampole,dcomplex[] bmpole,int[1] nterms,double[] center1,inout dcomplex[] ampole1,inout dcomplex[] bmpole1,int[1] nterms1,double[] radius1,double[] rnodes,double[] weights,int[1] nphi,int[1] ntheta);
+
+
+@function [ampole1,bmpole1]=em3mpta3(rk,center,ampole,bmpole,nterms,center1,nterms1,radius1,rnodes,weights,nphi,ntheta)
+%em3mpta3: Apply EM multipole to local translation operator.
+%
+%  [ampole1,bmpole1]=em3mpta3(rk,center,ampole,bmpole,nterms,...
+%           center1,nterms1,radius1,rnodes,weights,nphi,ntheta);
+%
+%  Convert the outgoing EM multipole expansion to
+%  the incoming EM multipole expansion. 
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in outgoing multipole expansions
+%    rk - frequency parameter
+%    center - real(3): sphere center location for outgoing expansion
+%    ampole,bmpole - complex(ncoefs,nspheres): outgoing EM multipoles
+%    center1 - real(3): sphere center location for incoming expansion
+%    nterms1 - the number of terms in incoming multipole expansions
+%    radius1 - real(nsource): sphere radius for the incoming expansion
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms1)
+%                 
+%  Output parameters:
+%
+%    ampole1,bmpole1 - complex(ncoefs): incoming EM multipoles
+%
+%
+
+ncoefs1 = (nterms1+1)*(2*nterms1+1);
+ampole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+bmpole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+
+
+#FORTRAN em3mpta3(dcomplex[1] rk,double[] center,dcomplex[] ampole,dcomplex[] bmpole,int[1] nterms,double[] center1,inout dcomplex[] ampole1,inout dcomplex[] bmpole1,int[1] nterms1,double[] radius1,double[] rnodes,double[] weights,int[1] nphi,int[1] ntheta);
+
+
+@function [ampole1,bmpole1]=em3tata3(rk,center,ampole,bmpole,nterms,center1,nterms1,radius1,rnodes,weights,nphi,ntheta)
+%em3tata3: Apply EM multipole to multipole translation operator.
+%
+%  [ampole1,bmpole1]=em3mpmp3(rk,center,ampole,bmpole,nterms,...
+%           center1,nterms1,radius1,rnodes,weights,nphi,ntheta);
+%
+%  Convert the incoming EM multipole expansion to
+%  the shifted incoming EM multipole expansion. 
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in incoming multipole expansions
+%    rk - frequency parameter
+%    center - real(3): sphere center location for incoming expansion
+%    ampole,bmpole - complex(ncoefs,nspheres): incoming EM multipoles
+%    center1 - real(3): sphere center location for shifted incoming expansion
+%    nterms1 - the number of terms in shifted incoming multipole expansions
+%    radius1 - real(nsource): sphere radius for the shifted incoming expansion
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a preceding call to e3fgrid(nterms1)
+%                 
+%  Output parameters:
+%
+%    ampole1,bmpole1 - complex(ncoefs1): shifted incoming EM multipoles
+%
+%
+
+ncoefs1 = (nterms1+1)*(2*nterms1+1);
+ampole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+bmpole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+
+
+#FORTRAN em3tata3(dcomplex[1] rk,double[] center,dcomplex[] ampole,dcomplex[] bmpole,int[1] nterms,double[] center1,inout dcomplex[] ampole1,inout dcomplex[] bmpole1,int[1] nterms1,double[] radius1,double[] rnodes,double[] weights,int[1] nphi,int[1] ntheta);
+
+
+@function [ampole1,bmpole1]=em3tata3_trunc(rk,center,ampole,bmpole,nterms,center1,nterms1,radius1,rnodes,weights,nphi,ntheta)
+%em3tata3_trunc: Apply EM multipole to multipole translation operator.
+%
+%  [ampole1,bmpole1]=em3mpmp3(rk,center,ampole,bmpole,nterms,...
+%           center1,nterms1,radius1,rnodes,weights,nphi,ntheta);
+%
+%  Convert the incoming EM multipole expansion to
+%  the shifted incoming EM multipole expansion with truncation. 
+%  
+%  All EM multipoles are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%  Input parameters:
+%
+%    nterms - the number of terms in incoming multipole expansions
+%    rk - frequency parameter
+%    center - real(3): sphere center location for incoming expansion
+%    ampole,bmpole - complex(ncoefs,nspheres): incoming EM multipoles
+%    center1 - real(3): sphere center location for shifted incoming expansion
+%    nterms1 - the number of terms in shifted incoming multipole expansions
+%    radius1 - real(nsource): sphere radius for the shifted incoming expansion
+%    rnodes,weights,nphi,ntheta - 
+%          spherical grid, constructed via a 
+%          preceding call to get_e3fgrid_trunc(nterms1,nterms1_phi)
+%                 
+%  Output parameters:
+%
+%    ampole1,bmpole1 - complex(ncoefs1): shifted incoming EM multipoles
+%
+%
+
+ncoefs1 = (nterms1+1)*(2*nterms1+1);
+ampole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+bmpole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
+
+
+#FORTRAN em3tata3trunc(dcomplex[1] rk,double[] center,dcomplex[] ampole,dcomplex[] bmpole,int[1] nterms,double[] center1,inout dcomplex[] ampole1,inout dcomplex[] bmpole1,int[1] nterms1,double[] radius1,double[] rnodes,double[] weights,int[1] nphi,int[1] ntheta);
+
+
+
+@function mpout=rotproj(beta,mpole,nterms)
+%ROTPROJ Rotate the complex spherical harmonics expansion about the y-axis.
+%
+%  MPOUT = rotproj(BETA,MPOLE,NTERMS) rotates the complex spherical 
+%  harmonics expansion of degree NTERMS about the y-axis by degree BETA. 
+%
+%  Both MPOUT and MPOLE are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%
+%  Fast and stable algorithm for applying rotation operator about
+%  the y-axis determined by angle beta.
+%
+%  The method is based on computing the induced potential and
+%  its theta-derivative on the rotated equator
+%  for each order (first index). The coefficients of  the rotated
+%  expansion can then be obtained by FFT and projection.
+%
+%  There is some loss in speed over using recurrence relations 
+%  but it is stable to all orders whereas the recurrence schemes 
+%  are not.
+%
+%  Our definition of complex spherical harmonics is
+%
+%  Ynm(theta,phi)= sqrt( 2n+1) sqrt((n-m)!/(n+m)!) 
+%                  Pnm(cos theta) e^(im phi), 
+%  Yn,-m(theta,phi) = sqrt( 2n+1) sqrt((n-m)!/(n+m)!) 
+%                  Pnm(cos theta) e^(-im phi),   for m >= 0.
+%       
+%  Note that we do not include the Condon-Shortley phase (-1)^m, if m<0.
+%
+
+m1=nterms;
+m2=nterms;
+
+mpout = zeros(nterms+1,2*nterms+1)+1i*zeros(nterms+1,2*nterms+1);
+
+lmp = nterms;
+lmpn = nterms;
+
+# FORTRAN rotviaprojvarf90(double[1] beta, int[1] nterms, int[1] m1, int[1] m2, inout  dcomplex[] mpole, int[1] lmp, inout dcomplex[] mpout, int[1] lmpn);
+
+
+@function mpout=rotprojvar(beta,mpole,nterms,m1,m2)
+%ROTPROJVAR Rotate the complex spherical harmonics expansion about the y-axis.
+%
+%  MPOUT = rotprojvar(BETA,MPOLE,NTERMS) rotates the complex spherical 
+%  harmonics expansion of degree NTERMS about the y-axis by degree BETA. 
+%
+%  MPOUT = rotprojvar(BETA,MPOLE,NTERMS,M1,M2) rotates the complex spherical 
+%  harmonics expansion of degree NTERMS about the y-axis by degree BETA. 
+%  Only modes up to degree M1 in the input MPOLE expansion and modes up 
+%  to degree M2 in the output expansion MPOUT will be used. 
+%
+%  Both MPOUT and MPOLE are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%
+%  Fast and stable algorithm for applying rotation operator about
+%  the y-axis determined by angle beta.
+%
+%  The method is based on computing the induced potential and
+%  its theta-derivative on the rotated equator
+%  for each order (first index). The coefficients of  the rotated
+%  expansion can then be obtained by FFT and projection.
+%
+%  There is some loss in speed over using recurrence relations 
+%  but it is stable to all orders whereas the recurrence schemes 
+%  are not.
+%
+%  Our definition of complex spherical harmonics is
+%
+%  Ynm(theta,phi)= sqrt( 2n+1) sqrt((n-m)!/(n+m)!) 
+%                  Pnm(cos theta) e^(im phi), 
+%  Yn,-m(theta,phi) = sqrt( 2n+1) sqrt((n-m)!/(n+m)!) 
+%                  Pnm(cos theta) e^(-im phi),   for m >= 0.
+%       
+%  Note that we do not include the Condon-Shortley phase (-1)^m, if m<0.
+%
+
+
+if (nargin < 4 )
+m1=nterms;
+end
+
+if (nargin < 5 )
+m2=nterms;
+end
+
+mpout = zeros(nterms+1,2*nterms+1)+1i*zeros(nterms+1,2*nterms+1);
+
+lmp = nterms;
+lmpn = nterms;
+
+# FORTRAN rotviaprojvarf90(double[1] beta, int[1] nterms, int[1] m1, int[1] m2, inout  dcomplex[] mpole, int[1] lmp, inout dcomplex[] mpout, int[1] lmpn);
+
+
+@function mpout=rotviarecur(beta,mpole,nterms,m1,m2)
+%ROTVIARECUR Rotate the complex spherical harmonics about the y-axis. 
+%
+%  MPOUT = rotviarecur(BETA,MPOLE,NTERMS) rotates the complex spherical 
+%  harmonics expansion of degree NTERMS about the y-axis by degree BETA. 
+%
+%  MPOUT = rotviarecur(BETA,MPOLE,NTERMS,M1,M2) rotates the complex spherical 
+%  harmonics expansion of degree NTERMS about the y-axis by degree BETA. 
+%  Only modes up to degree M1 in the input MPOLE expansion and modes up 
+%  to degree M2 in the output expansion MPOUT will be used. 
+%  
+%  Both MPOUT and MPOLE are (NTERMS+1)-by-(2*NTERMS+1) complex matrices.
+%
+%
+%  Fast, recursive algorithm for applying rotation operator about
+%  the y-axis determined by angle beta. It is good for NTERMS up to 100 or so.
+%
+%  Our definition of complex spherical harmonics is
+%
+%  Ynm(theta,phi)= sqrt( 2n+1) sqrt((n-m)!/(n+m)!) 
+%                  Pnm(cos theta) e^(im phi), 
+%  Yn,-m(theta,phi) = sqrt( 2n+1) sqrt((n-m)!/(n+m)!) 
+%                  Pnm(cos theta) e^(-im phi),   for m >= 0.
+%       
+%  Note that we do not include the Condon-Shortley phase (-1)^m, if m<0.
+%
+
+if (nargin < 4 )
+m1=nterms;
+end
+
+if (nargin < 5 )
+m2=nterms;
+end
+
+mpout = zeros(nterms+1,2*nterms+1)+1i*zeros(nterms+1,2*nterms+1);
+
+lmp = nterms;
+lmpn = nterms;
+
+# FORTRAN rotviarecur3f90(double[1] beta, int[1] nterms, int[1] m1, int[1] m2, inout  dcomplex[] mpole, int[1] lmp, inout dcomplex[] mpout, int[1] lmpn);
+
+
+
+@function fmps_prini(unit1,unit2)
+%FMPS_PRINI Initialize internal printing/debugging routines.
+%
+% Calling FMPS_PRINI(6,13) causes printing to screen and file fort.13.     
+%
+
+if (nargin == 1 )
+unit2=0;
+end
+
+# FORTRAN prini(int[1] unit1, int[1] unit2);
+

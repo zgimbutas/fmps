@@ -1,0 +1,93 @@
+#
+#  Generate Matlab/Octave MEX files
+#
+#  gfortran > 4.4.0 is strongly recommended
+#
+
+PROJECT = fmps_r2012a
+MEX_GATEWAY = $(PROJECT)
+
+###TARGET=octave-linux
+TARGET=octave-linux-openmp
+
+###TARGET=octave-linux-intel
+###TARGET=octave-linux-intel-openmp
+
+###TARGET=matlab-linux-a64
+###TARGET=matlab-linux-a64-openmp
+
+###TARGET=matlab-linux-intel-a64
+###TARGET=matlab-linux-a64-intel-openmp
+
+###TARGET=matlab-maci
+###TARGET=matlab-maci-openmp
+###TARGET=matlab-maci64
+###TARGET=matlab-maci64-openmp
+
+###TARGET=matlab-windows-w32
+###TARGET=matlab-windows-w32-openmp
+###TARGET=matlab-windows-w64
+###TARGET=matlab-windows-w64-openmp
+
+include mwrap.inc
+
+
+.f.$(OBJSUF):
+	$(MEX_FC) $(MEX_FLAGS) -c $(FFLAGS) $<
+
+.c.$(OBJSUF):
+	$(MEX_CC) $(MEX_FLAGS) -c $(CFLAGS) $<
+
+.SUFFIXES: .$(OBJSUF) .f .c
+
+
+# SOURCE FILE LIST
+#
+#####vpath .:../src:..:../emlib:../../FMM3D:../../H3DLibraries:../../L3DLibraries:../../Quadratures:../../Geometry:../../Common:../lib:../geo
+
+# SOURCE FILE LIST
+#
+vpath %.f .:../src/fmps
+
+
+FSRCS = fmpsrouts.f emdyadic.f emplanew.f emrouts3.f emabrot3var.f \
+     xrecursion.f yrecursion.f rotviarecur3.f framerot.f legeexps.f \
+     dfft.f hjfuns3d.f cgmres_rel.f cbicgstab_rel.f prini.f prinm.f xprini.f \
+     emfmm3dsph_e2.f  emfmm3drouts_e2.f \
+     em3dpartdirecttarg.f \
+     d3tstrcr.f treeplot.f h3dterms.f helmrouts2.f helmrouts2_trunc.f \
+     h3dmpmpfinal4.f h3dmplocfinal4.f projections.f \
+     h3dloclocfinal4.f rotprojvar.f \
+     triahquad.f triagauc.f triasymq.f trirouts.f \
+     triquadflatlib.f trilib.f
+
+#FSRCS +=  patchmatcflat2.f patchmatcquad2.f \
+#          patchmatc3.f dotcross3d.f inter3dn.f \
+#          triaselfquad2.f triaselftables012.f triaselftables3.f \
+#          c8triadam.f c9triadam.f c28triadam.f c29triadam.f \
+#          ortho2eva.f ortho2exps2.f orthom.f 
+
+
+#
+# object files list
+OBJS    = $(FSRCS:.f=.$(OBJSUF)) 
+#
+
+all: $(OBJS) 
+	$(MW) $(MWFLAGS) $(MEX_GATEWAY) -mb $(PROJECT).mw
+	$(MW) $(MWFLAGS) $(MEX_GATEWAY) -c $(MEX_GATEWAY).c $(PROJECT).mw
+	$(MEX) -v $(MEX_FLAGS) $(MEX_LINK) $(MEX_GATEWAY).c $(OBJS) $(MEX_LIBS)
+
+doc:
+	$(MW) $(MWFLAGS) $(MEX_GATEWAY) -mb $(PROJECT).mw
+
+#
+clean: 
+	rm -f $(OBJS)
+# 
+list: $(FSRCS)
+	echo $^
+#
+distclean: 
+	rm -f $(OBJS) int2 fort.* *.o
+

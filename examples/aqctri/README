@@ -1,0 +1,112 @@
+
+Flat triangulation (Cart3d) file format
+=======================================
+
+(adapted from
+http://people.nas.nasa.gov/aftosmis/cart3d/cart3dTriangulations.html)
+
+\begin{verbatim}
+nverts, ntri              <- total # of unique verts/tris, (int, int)
+x_1, y_1, z_1             <- Geometry of Vertex 1 (float, float, float)
+x_2, y_2, z_2             <- Geometry of Vertex 2 (float, float, float)
+x_3, y_3, z_3             <- ...
+.
+.
+.
+x_nverts, y_nverts, z_nverts <- geom of last unique vertex (nverts)
+v1_t1, v2_t1, v3_t1              <- Vertices of triangle 1 (int, int, int)
+v1_t2, v2_t2, v3_t2              <- Vertices of triangle 2 (int, int, int)
+v1_t3, v2_t3, v3_t3              <- Vertices of triangle 3 (int, int, int)
+.
+.
+.
+
+_____________
+Example of F77 code for reading a *.a.tri file
+read(iUnit,*) nverts, ntri
+read(iUnit,*) ( verts(1,j), verts(2,j), verts(3,j), j=1,nverts)
+read(iUnit,*) ( itrivert(1,j), itrivert(2,j), itrivert(3,j), j=1,ntri)
+
+Ordering of vertices:
+
+            3
+          .   . 
+         .     .
+        .       .
+       1 .. . .. 2
+
+
+
+Quadratic triangulation file format
+===================================
+
+nverts, ntri              <- total # of unique verts/tris, (int, int)
+x_1, y_1, z_1             <- Geometry of Vertex 1 (float, float, float)
+x_2, y_2, z_2             <- Geometry of Vertex 2 (float, float, float)
+x_3, y_3, z_3             <- ...
+.
+.
+.
+x_nverts, y_nverts, z_nverts <- geom of last unique vertex (nverts)
+
+v1_t1, v2_t1, v3_t1, va_t1, vb_t1, vc_t1  <- Vertices and mid points of 
+                            triangles 1 .. ntri (int,int,int,int,int,int)
+.
+.
+v1_ntri, v2_ntri, v3_ntri, va_ntri, vb_ntri, vc_ntri  
+
+_____________
+Example of F77 code for reading a *.q.tri file
+read(iUnit,*) nverts, ntri
+read(iUnit,*) ( verts(1,j), verts(2,j), verts(3,j), j=1,nverts)
+read(iUnit,*) ( (itrivert(i,j), i=1,6), j=1,ntri)
+_____________
+
+Ordering of vertices and mid points:
+
+            3
+          .   . 
+         C     B
+        .       .
+       1 .. A .. 2
+
+
+
+
+Cubic triangulation file format
+===================================
+
+nverts, ntri              <- total # of unique verts/tris, (int, int)
+x_1, y_1, z_1             <- Geometry of Vertex 1 (float, float, float)
+x_2, y_2, z_2             <- Geometry of Vertex 2 (float, float, float)
+x_3, y_3, z_3             <- ...
+.
+.
+.
+x_nverts, y_nverts, z_nverts <- geom of last unique vertex (nverts)
+
+v1_t1, v2_t1, v3_t1, va1_t1, va2_t1, vb1_t1, vb2_t1, vc1_t1, vc2_t1, vm_t1 
+              <- Vertices and mid points of 
+                 triangles 1 .. ntri (int,int,int,int,int,int,int,int,int,int)
+.
+.
+v1_tn, v2_tn, v3_tn, va1_tn, va2_tn, vb1_tn, vb2_tn, vc1_tn, vc2_tn, vm_tn
+
+_____________
+Example of F77 code for reading a *.c.tri file
+read(iUnit,*) nverts, ntri
+read(iUnit,*) ( verts(1,j), verts(2,j), verts(3,j), j=1,nverts)
+read(iUnit,*) ( (itrivert(i,j), i=1,10), j=1,ntri)
+_____________
+
+Ordering of vertices and mid points:
+
+
+              3
+             . .     
+           C1   B2 
+          .       .
+         C2   M   B1
+        .           .
+       1 . A1 . A2 . 2
+

@@ -1,0 +1,24 @@
+You have: coulomb volt 
+You want: joules
+        * 1
+        / 1
+You have: e
+You want: 
+        Definition: 1.602176462e-19 C = 1.6021765e-19 A s
+You have: e volt
+You want: 
+        Definition: 1.6021765e-19 kg m^2 / s^2
+You have: h
+You want: 
+        Definition: 6.62606876e-34 J s = 6.6260688e-34 kg m^2 / s
+You have: h c
+You want: 
+        Definition: 1.9864454e-25 kg m^3 / s^2
+You have: h c / e volt
+You want: 
+        Definition: 1.2398419e-06 m
+You have: h c / e volt
+You want: nm
+        * 1239.8419
+        / 0.00080655448
+
