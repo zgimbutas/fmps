@@ -1,0 +1,3 @@
+set parametric
+splot 'fort.16', cos(v)*cos(u)*50,sin(v)*cos(u)*50,sin(u)*50
+
