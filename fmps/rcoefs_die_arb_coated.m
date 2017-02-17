@@ -41,5 +41,5 @@ function [ra,rb,ta,tb]=rcoefs_die_arb_coated(nterms,omega,r1,r2,eps1,cmu1,eps2,c
 ra = ra32 + (ta23.*ra21.*ta32) ./ (1-ra23.*ra21);
 rb = rb32 + (tb23.*rb21.*tb32) ./ (1-rb23.*rb21);
 
-ta = ta32 ./ (1-ra23.*ra21);
-tb = tb32 ./ (1-rb23.*rb21);
+ta = ta21.*ta32 ./ (1-ra23.*ra21);
+tb = tb21.*tb32 ./ (1-rb23.*rb21);

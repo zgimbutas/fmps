@@ -39,5 +39,5 @@ function [ra,rb,ta,tb]=rcoefs_pec_coated(nterms,omega,r1,r2,eps2,cmu2,eps3,cmu3)
 ra = ra32 + (ta23.*ra21.*ta32) ./ (1-ra23.*ra21);
 rb = rb32 + (tb23.*rb21.*tb32) ./ (1-rb23.*rb21);
 
-ta = ta32 ./ (1-ra23.*ra21);
-tb = tb32 ./ (1-rb23.*rb21);
+ta = 0*ta32 ./ (1-ra23.*ra21);
+tb = 0*tb32 ./ (1-rb23.*rb21);
