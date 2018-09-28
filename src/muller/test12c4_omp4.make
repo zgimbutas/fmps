@@ -4,8 +4,8 @@ PROJECT=int2         # for historical reasons we always like to
 
 
 ###HOST=windows
-HOST=linux
-###HOST=macosx
+###HOST=linux
+HOST=macosx
 
 
 ifeq ($(HOST),linux)

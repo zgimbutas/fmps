@@ -1,3 +1,5 @@
 *.o
 *~
+int2
+scatmatr.txt
 fort.*
