@@ -24,7 +24,7 @@ evec = zeros(3,1) + 1i*zeros(3,1);
 hvec = zeros(3,1) + 1i*zeros(3,1);
 
 mex_id_ = 'dipole3mt(i dcomplex[x], i double[x], i double[x], i dcomplex[x], io dcomplex[x], io dcomplex[x])';
-[evec, hvec] = fmps_r2012a(mex_id_, rk, source, target, cmvec, evec, hvec, 1, 3, 3, 3, 3, 3);
+[evec, hvec] = fmps(mex_id_, rk, source, target, cmvec, evec, hvec, 1, 3, 3, 3, 3, 3);
 
 
 

@@ -26,7 +26,7 @@ pvec = zeros(3,1) + 1i*zeros(3,1);
 mvec = zeros(3,1) + 1i*zeros(3,1);
 
 mex_id_ = 'empol(i double[x], i dcomplex[x], i dcomplex[], i dcomplex[], i int[x], i double[x], io dcomplex[], io dcomplex[])';
-[pvec, mvec] = fmps_r2012a(mex_id_, wavelength, rk, ampole, bmpole, nterms, radius, pvec, mvec, 1, 1, 1, 1);
+[pvec, mvec] = fmps(mex_id_, wavelength, rk, ampole, bmpole, nterms, radius, pvec, mvec, 1, 1, 1, 1);
 
 
 

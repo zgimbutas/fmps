@@ -29,6 +29,6 @@ evecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
 hvecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
 
 mex_id_ = 'em3mpfarehfast(i dcomplex[x], i double[], i dcomplex[], i dcomplex[], i int[x], io dcomplex[], io dcomplex[], i double[], i double[], i int[x], i int[x])';
-[evecs, hvecs] = fmps_r2012a(mex_id_, rk, center, aompole, bompole, nterms, evecs, hvecs, rnodes, weights, nphi, ntheta, 1, 1, 1, 1);
+[evecs, hvecs] = fmps(mex_id_, rk, center, aompole, bompole, nterms, evecs, hvecs, rnodes, weights, nphi, ntheta, 1, 1, 1, 1);
 
 

@@ -26,6 +26,6 @@ ampole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
 bmpole = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
 
 mex_id_ = 'em3formmp(i dcomplex[x], i double[], i dcomplex[], i dcomplex[], i int[x], i double[], io dcomplex[], io dcomplex[], i int[x])';
-[ampole, bmpole] = fmps_r2012a(mex_id_, rk, source, cjvec, cmvec, npts, center, ampole, bmpole, nterms, 1, 1, 1);
+[ampole, bmpole] = fmps(mex_id_, rk, source, cjvec, cmvec, npts, center, ampole, bmpole, nterms, 1, 1, 1);
 
 

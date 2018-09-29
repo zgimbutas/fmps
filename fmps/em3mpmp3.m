@@ -33,6 +33,6 @@ bmpole1 = zeros(ncoefs1,1) + 1i*zeros(ncoefs1,1);
 
 
 mex_id_ = 'em3mpmp3(i dcomplex[x], i double[], i dcomplex[], i dcomplex[], i int[x], i double[], io dcomplex[], io dcomplex[], i int[x], i double[], i double[], i double[], i int[x], i int[x])';
-[ampole1, bmpole1] = fmps_r2012a(mex_id_, rk, center, ampole, bmpole, nterms, center1, ampole1, bmpole1, nterms1, radius1, rnodes, weights, nphi, ntheta, 1, 1, 1, 1, 1);
+[ampole1, bmpole1] = fmps(mex_id_, rk, center, ampole, bmpole, nterms, center1, ampole1, bmpole1, nterms1, radius1, rnodes, weights, nphi, ntheta, 1, 1, 1, 1, 1);
 
 

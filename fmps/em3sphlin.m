@@ -19,6 +19,6 @@ nvec = (nterms+1)*(nterms+1);
 cvec = zeros(nvec,1) + 1i*zeros(nvec,1);
 
 mex_id_ = 'em3sphlin(i dcomplex[], i int[x], io dcomplex[])';
-[cvec] = fmps_r2012a(mex_id_, ampole, nterms, cvec, 1);
+[cvec] = fmps(mex_id_, ampole, nterms, cvec, 1);
 
 

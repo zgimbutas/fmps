@@ -30,6 +30,6 @@ evecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
 hvecs = zeros(3,nnodes) + 1i*zeros(3,nnodes);
 
 mex_id_ = 'em3taevaleh(i dcomplex[x], i double[], i dcomplex[], i dcomplex[], i int[x], i double[], i double[], io dcomplex[], io dcomplex[], i double[], i double[], i int[x], i int[x])';
-[evecs, hvecs] = fmps_r2012a(mex_id_, rk, center, aimpole, bimpole, nterms, sphere_xyz, sphere_r, evecs, hvecs, rnodes, weights, nphi, ntheta, 1, 1, 1, 1);
+[evecs, hvecs] = fmps(mex_id_, rk, center, aimpole, bimpole, nterms, sphere_xyz, sphere_r, evecs, hvecs, rnodes, weights, nphi, ntheta, 1, 1, 1, 1);
 
 

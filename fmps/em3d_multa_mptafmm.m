@@ -39,7 +39,7 @@ ier=0;
 
 if( nspheres > 1 ),
 mex_id_ = 'emfmm3dsph(io int[x], i int[x], i dcomplex[x], i int[x], i double[], i double[], i dcomplex[], i dcomplex[], io dcomplex[], io dcomplex[], i int[x])';
-[ier, asmpole, bsmpole] = fmps_r2012a(mex_id_, ier, iprec, zk, nspheres, center, radius, aompole, bompole, asmpole, bsmpole, nterms, 1, 1, 1, 1, 1);
+[ier, asmpole, bsmpole] = fmps(mex_id_, ier, iprec, zk, nspheres, center, radius, aompole, bompole, asmpole, bsmpole, nterms, 1, 1, 1, 1, 1);
 end
 
 
