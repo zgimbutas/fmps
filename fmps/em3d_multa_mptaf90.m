@@ -35,7 +35,7 @@ bsmpole = zeros(ncoefs,nspheres) + 1i*zeros(ncoefs,nspheres);
 
 if( nspheres > 1 ),
 mex_id_ = 'em3dmpta(i int[x], i int[x], i int[x], i double[x], i dcomplex[x], i dcomplex[x], i double[], i double[], i dcomplex[], i dcomplex[], io dcomplex[], io dcomplex[], i double[], i double[], i int[x], i int[x])';
-[asmpole, bsmpole] = fmps(mex_id_, nspheres, nterms, ncoefs, omega, eps0, cmu0, center, radius, aompole, bompole, asmpole, bsmpole, rnodes, weights, nphi, ntheta, 1, 1, 1, 1, 1, 1, 1, 1);
+[asmpole, bsmpole] = fmps_r2012a(mex_id_, nspheres, nterms, ncoefs, omega, eps0, cmu0, center, radius, aompole, bompole, asmpole, bsmpole, rnodes, weights, nphi, ntheta, 1, 1, 1, 1, 1, 1, 1, 1);
 end
 
 

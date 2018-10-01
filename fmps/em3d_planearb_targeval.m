@@ -22,6 +22,6 @@ evec = zeros(3,ntargets) + 1i*zeros(3,ntargets);
 hvec = zeros(3,ntargets) + 1i*zeros(3,ntargets);
 
 mex_id_ = 'emplanearbtargeval(i dcomplex[], i dcomplex[], i int[x], i double[], io dcomplex[], io dcomplex[])';
-[evec, hvec] = fmps(mex_id_, rkvec, epol, ntargets, targets, evec, hvec, 1);
+[evec, hvec] = fmps_r2012a(mex_id_, rkvec, epol, ntargets, targets, evec, hvec, 1);
 
 

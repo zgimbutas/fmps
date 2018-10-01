@@ -23,7 +23,7 @@ ncoefs = (nterms+1)*(2*nterms+1);
 mpout = zeros(ncoefs,1) + 1i*zeros(ncoefs,1);
 
 mex_id_ = 'emabrotaf(i int[x], i double[], i dcomplex[], io dcomplex[])';
-[mpout] = fmps(mex_id_, nterms, rota, mpole, mpout, 1);
+[mpout] = fmps_r2012a(mex_id_, nterms, rota, mpole, mpout, 1);
 
 
 

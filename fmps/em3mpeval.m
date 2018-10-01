@@ -23,6 +23,6 @@ evec = zeros(3,1) + 1i*zeros(3,1);
 hvec = zeros(3,1) + 1i*zeros(3,1);
 
 mex_id_ = 'em3mpeval(i dcomplex[x], i double[], i dcomplex[], i dcomplex[], i int[x], i double[], io dcomplex[], io dcomplex[])';
-[evec, hvec] = fmps(mex_id_, rk, center, aompole, bompole, nterms, target, evec, hvec, 1, 1);
+[evec, hvec] = fmps_r2012a(mex_id_, rk, center, aompole, bompole, nterms, target, evec, hvec, 1, 1);
 
 

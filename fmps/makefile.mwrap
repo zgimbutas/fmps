@@ -4,7 +4,7 @@
 #  gfortran > 4.4.0 is strongly recommended
 #
 
-PROJECT = fmps
+PROJECT = fmps_r2012a
 MEX_GATEWAY = $(PROJECT)
 
 ###TARGET=octave-linux
