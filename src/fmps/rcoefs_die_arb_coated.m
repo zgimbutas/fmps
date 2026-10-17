@@ -2,7 +2,7 @@ function [ra,rb,ta,tb]=rcoefs_die_arb_coated(nterms,omega,r1,r2,eps1,cmu1,eps2,c
 %RCOEFS_DIE_ARB_COATED Reflection coefficients for a coated sphere.
 %
 %  [ra,rb,ta,tb]=rcoefs_die_arb_coated ...
-%           (nterms,omega,r1,r2,eps1,cmu1,eps2,eps2,eps3,cmu3);
+%           (nterms,omega,r1,r2,eps1,cmu1,eps2,cmu2,eps3,cmu3);
 %
 %  Construct reflection and transmission coefficients
 %  for an arbitrary coated dielectric sphere.
@@ -24,10 +24,10 @@ function [ra,rb,ta,tb]=rcoefs_die_arb_coated(nterms,omega,r1,r2,eps1,cmu1,eps2,c
 %
 %  Output parameters:
 %
-%    ra - complex(nterms+1): TM reflection coefficients
-%    rb - complex(nterms+1): TE reflection coefficients
-%    ta - complex(nterms+1): TM transmission coefficients
-%    tb - complex(nterms+1): TE transmission coefficients
+%    ra - complex(nterms+1): TE (magnetic multipole) reflection coefficients
+%    rb - complex(nterms+1): TM (electric multipole) reflection coefficients
+%    ta - complex(nterms+1): TE (magnetic multipole) transmission coefficients
+%    tb - complex(nterms+1): TM (electric multipole) transmission coefficients
 % 
 
 [ra32,rb32] = rcoefs_die_arb21(nterms,omega,r2,eps3,cmu3,eps2,cmu2);
@@ -37,6 +37,7 @@ function [ra,rb,ta,tb]=rcoefs_die_arb_coated(nterms,omega,r1,r2,eps1,cmu1,eps2,c
 [ta23,tb23] = tcoefs_die_arb12(nterms,omega,r2,eps2,cmu2,eps3,cmu3);
 
 [ra21,rb21] = rcoefs_die_arb21(nterms,omega,r1,eps2,cmu2,eps1,cmu1);
+[ta21,tb21] = tcoefs_die_arb21(nterms,omega,r1,eps2,cmu2,eps1,cmu1);
 
 ra = ra32 + (ta23.*ra21.*ta32) ./ (1-ra23.*ra21);
 rb = rb32 + (tb23.*rb21.*tb32) ./ (1-rb23.*rb21);
