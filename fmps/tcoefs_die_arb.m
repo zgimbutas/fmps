@@ -3,6 +3,10 @@ function [ta,tb]=tcoefs_die_arb(nterms,omega,r,eps1,cmu1,eps2,cmu2)
 %  Construct transmission coefficients for an arbitrary dielectric sphere
 %  Incoming wave
 %
+%  ta, tb are the TE and TM coefficients, i.e. up to normalization
+%  the d and c of the FMPS paper (arXiv:1104.5293, eqs. 7-8) and the
+%  c and d of Bohren & Huffman.
+%
 
 
 z1=omega*sqrt(eps1)*sqrt(cmu1)*r;

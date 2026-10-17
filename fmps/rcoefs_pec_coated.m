@@ -26,6 +26,12 @@ function [ra,rb,ta,tb]=rcoefs_pec_coated(nterms,omega,r1,r2,eps2,cmu2,eps3,cmu3)
 %    rb - complex(nterms+1): TM (electric multipole) reflection coefficients
 %    ta - complex(nterms+1): TE (magnetic multipole) transmission coefficients
 %    tb - complex(nterms+1): TM (electric multipole) transmission coefficients
+%
+%  Note: ra, rb are the TE and TM coefficients, i.e. the b and a of
+%  the FMPS paper (arXiv:1104.5293, eqs. 7-10) and of Bohren & Huffman.
+%  Note: ta, tb are the TE and TM coefficients, i.e. up to normalization
+%  the d and c of the FMPS paper (arXiv:1104.5293, eqs. 7-8) and the
+%  c and d of Bohren & Huffman.
 % 
 
 [ra32,rb32] = rcoefs_die_arb21(nterms,omega,r2,eps3,cmu3,eps2,cmu2);

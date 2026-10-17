@@ -20,6 +20,10 @@ function [ta,tb]=tcoefs_die_arb21(nterms,omega,r,eps1,cmu1,eps2,cmu2)
 %
 %    ta - complex(nterms+1): TE (magnetic multipole) transmission coefficients
 %    tb - complex(nterms+1): TM (electric multipole) transmission coefficients
+%
+%  Note: ta, tb are the TE and TM coefficients, i.e. up to normalization
+%  the d and c of the FMPS paper (arXiv:1104.5293, eqs. 7-8) and the
+%  c and d of Bohren & Huffman.
 % 
 
 

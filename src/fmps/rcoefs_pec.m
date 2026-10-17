@@ -18,6 +18,9 @@ function [ra,rb]=rcoefs_pec(nterms,omega,r,eps1,cmu1)
 %
 %    ra - complex(nterms+1): TE (magnetic multipole) reflection coefficients
 %    rb - complex(nterms+1): TM (electric multipole) reflection coefficients
+%
+%  Note: ra, rb are the TE and TM coefficients, i.e. the b and a of
+%  the FMPS paper (arXiv:1104.5293, eqs. 7-10) and of Bohren & Huffman.
 % 
 
 z1=omega*sqrt(eps1)*sqrt(cmu1)*r;
