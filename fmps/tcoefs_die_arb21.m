@@ -18,8 +18,8 @@ function [ta,tb]=tcoefs_die_arb21(nterms,omega,r,eps1,cmu1,eps2,cmu2)
 %
 %  Output parameters:
 %
-%    ta - complex(nterms+1): TM transmission coefficients
-%    tb - complex(nterms+1): TE transmission coefficients
+%    ta - complex(nterms+1): TE (magnetic multipole) transmission coefficients
+%    tb - complex(nterms+1): TM (electric multipole) transmission coefficients
 % 
 
 
@@ -40,7 +40,7 @@ k = 2:(nterms+1);
 ima = 1i;
 
 %
-%  Transmission coefficients: TM_21, TE_21
+%  Transmission coefficients: TE_21, TM_21
 %
 ta =  ima*eps1*(sqrt(cmu1)/sqrt(eps2))./ ...
       (sqrt(eps1).*sqrt(cmu2).*emthvals1(k).*jvals2(k)-   ...

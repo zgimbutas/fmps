@@ -22,10 +22,10 @@ function [ra,rb,ta,tb]=rcoefs_pec_coated(nterms,omega,r1,r2,eps2,cmu2,eps3,cmu3)
 %
 %  Output parameters:
 %
-%    ra - complex(nterms+1): TM reflection coefficients
-%    rb - complex(nterms+1): TE reflection coefficients
-%    ta - complex(nterms+1): TM transmission coefficients
-%    tb - complex(nterms+1): TE transmission coefficients
+%    ra - complex(nterms+1): TE (magnetic multipole) reflection coefficients
+%    rb - complex(nterms+1): TM (electric multipole) reflection coefficients
+%    ta - complex(nterms+1): TE (magnetic multipole) transmission coefficients
+%    tb - complex(nterms+1): TM (electric multipole) transmission coefficients
 % 
 
 [ra32,rb32] = rcoefs_die_arb21(nterms,omega,r2,eps3,cmu3,eps2,cmu2);

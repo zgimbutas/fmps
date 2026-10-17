@@ -16,8 +16,8 @@ function [ra,rb]=rcoefs_pec(nterms,omega,r,eps1,cmu1)
 %
 %  Output parameters:
 %
-%    ra - complex(nterms+1): TM reflection coefficients
-%    rb - complex(nterms+1): TE reflection coefficients
+%    ra - complex(nterms+1): TE (magnetic multipole) reflection coefficients
+%    rb - complex(nterms+1): TM (electric multipole) reflection coefficients
 % 
 
 z1=omega*sqrt(eps1)*sqrt(cmu1)*r;

@@ -18,8 +18,8 @@ function [ra,rb]=rcoefs_die_arb12(nterms,omega,r,eps1,cmu1,eps2,cmu2)
 %
 %  Output parameters:
 %
-%    ra - complex(nterms+1): TM reflection coefficients
-%    rb - complex(nterms+1): TE reflection coefficients
+%    ra - complex(nterms+1): TE (magnetic multipole) reflection coefficients
+%    rb - complex(nterms+1): TM (electric multipole) reflection coefficients
 % 
 
 
@@ -38,7 +38,7 @@ z2=omega*sqrt(eps2)*sqrt(cmu2)*r;
 k = 2:(nterms+1);
 
 %
-%  Reflection coefficients: TM_12, TE_12
+%  Reflection coefficients: TE_12, TM_12
 %
 ra = -(sqrt(eps1).*sqrt(cmu2).*emthvals1(k).*hvals2(k)-   ...
        sqrt(eps2).*sqrt(cmu1).*emthvals2(k).*hvals1(k))./ ...

@@ -22,7 +22,7 @@ k = 2:(nterms+1);
 ima = 1i;
 
 %
-%  Transmission coefficients: TM_21, TE_21
+%  Transmission coefficients: TE_21, TM_21
 %
 ta =  ima*eps1*(sqrt(cmu1)/sqrt(eps2))./ ...
       (sqrt(eps1).*sqrt(cmu2).*emthvals1(k).*jvals2(k)-   ...
